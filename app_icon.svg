@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50" height="50" viewBox="0 0 50 50">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="사각형_6" data-name="사각형 6" width="50" height="50" transform="translate(420 -185)" fill="#fff"/>
+    </clipPath>
+    <clipPath id="clip-path-2">
+      <rect id="사각형_5" data-name="사각형 5" width="50" height="50" fill="#fff"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="1" y1="1" x2="0.011" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#4053c2"/>
+      <stop offset="0.172" stop-color="#567cd3"/>
+      <stop offset="0.394" stop-color="#5690d3"/>
+      <stop offset="0.581" stop-color="#5baac2"/>
+      <stop offset="0.798" stop-color="#5bc2c2"/>
+      <stop offset="1" stop-color="#76d4b0"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.367" y1="0.969" x2="0.125" y2="0.111" xlink:href="#linear-gradient"/>
+    <filter id="패스_8" x="-150.939" y="-152.189" width="354.422" height="344.289" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="45" result="blur"/>
+      <feFlood flood-color="#fff" flood-opacity="0.102"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <linearGradient id="linear-gradient-3" x1="0.956" y1="0" x2="0.017" y2="0.611" xlink:href="#linear-gradient"/>
+    <filter id="패스_9" x="-151.987" y="-145.906" width="345.451" height="336.561" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="45" result="blur-2"/>
+      <feFlood flood-color="#fff" flood-opacity="0.149"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="패스_10" x="-149.097" y="-141.132" width="327.491" height="314.655" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="45" result="blur-3"/>
+      <feFlood flood-color="#fff" flood-opacity="0.102"/>
+      <feComposite operator="in" in2="blur-3"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="패스_11" x="-122.253" y="-119.454" width="278.233" height="257.89" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="40" result="blur-4"/>
+      <feFlood flood-color="#fff" flood-opacity="0.102"/>
+      <feComposite operator="in" in2="blur-4"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-app">
+      <rect width="50" height="50"/>
+    </clipPath>
+  </defs>
+  <g id="app" clip-path="url(#clip-app)">
+    <rect width="50" height="50" fill="#fff"/>
+    <g id="마스크_그룹_2" data-name="마스크 그룹 2" transform="translate(-420 185)" clip-path="url(#clip-path)">
+      <g id="그룹_9" data-name="그룹 9" transform="translate(420 -185)">
+        <g id="마스크_그룹_1" data-name="마스크 그룹 1" transform="translate(0 0)" clip-path="url(#clip-path-2)">
+          <g id="그룹_8" data-name="그룹 8" transform="translate(-14.07 -24.822)">
+            <g id="그룹_7" data-name="그룹 7" transform="translate(0 0)">
+              <rect id="사각형_4" data-name="사각형 4" width="50" height="50" transform="translate(14.07 24.822)" fill="url(#linear-gradient)"/>
+              <g transform="matrix(1, 0, 0, 1, 14.07, 24.82)" filter="url(#패스_8)">
+                <path id="패스_8-2" data-name="패스 8" d="M77.733,21.622,18.569-1.4S-20.909,57.451,10.12,66.449,78.035,22.978,78.035,22.978" transform="translate(-14.07 -13.35) rotate(-4)" opacity="0.15" fill="url(#linear-gradient-2)"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, 14.07, 24.82)" filter="url(#패스_9)">
+                <path id="패스_9-2" data-name="패스 9" d="M63.72,9.8S26.06-10.663,12.268-1.02-10.71,42.856,6.929,51.238,63.987,11.112,63.987,11.112" transform="matrix(0.98, -0.17, 0.17, 0.98, -13.62, 0.75)" opacity="0.15" fill="url(#linear-gradient-3)"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, 14.07, 24.82)" filter="url(#패스_10)">
+                <path id="패스_10-2" data-name="패스 10" d="M50,5.052S20.338-7.468,9.653-1.008-7.863,27.678,6.018,32.767s44.2-26.874,44.2-26.874" transform="matrix(0.98, -0.17, 0.17, 0.98, -11.85, 2.41)" opacity="0.25" fill="url(#linear-gradient-3)"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, 14.07, 24.82)" filter="url(#패스_11)">
+                <path id="패스_11-2" data-name="패스 11" d="M38.233,0H0V17.551S7.584,21.825,38.233,0" transform="translate(-2.25 -2.45)" opacity="0.32" fill="url(#linear-gradient-3)"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="그룹_6" data-name="그룹 6" transform="translate(3 4)">
+      <path id="패스_2" data-name="패스 2" d="M47.081,36.427H66.8" transform="translate(-35.081 -13.127)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+      <path id="패스_3" data-name="패스 3" d="M47.081,36.427H66.8" transform="translate(-35.081 -8.486)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+      <path id="패스_4" data-name="패스 4" d="M47.081,36.427H66.8" transform="translate(-35.081 -3.846)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+      <path id="패스_6" data-name="패스 6" d="M116.237,65.712l9.862-8.925,9.862,8.925" transform="translate(-104.237 -46.787)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
