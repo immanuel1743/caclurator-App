@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10.691" height="16.83" viewBox="0 0 10.691 16.83">
+    <g data-name="그룹 128">
+        <g data-name="사각형 68" style="stroke-linejoin:round;stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none">
+            <path style="stroke:none" d="M0 0h10.691v12.982H0z" transform="translate(0 3.848)"/>
+            <path style="fill:none" d="M.5.5h9.691v11.982H.5z" transform="translate(0 3.848)"/>
+        </g>
+        <g data-name="그룹 127">
+            <path data-name="패스 70" d="M400.4 2817.982v6.8" transform="translate(-397.598 -2811.041)" style="stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none"/>
+            <path data-name="패스 71" d="M400.4 2817.982v6.8" transform="translate(-395.104 -2811.041)" style="stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none"/>
+            <path data-name="패스 72" d="M400.4 2817.982v6.8" transform="translate(-392.61 -2811.041)" style="stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none"/>
+        </g>
+        <path data-name="패스 73" d="M404.082 2805.762v.862" transform="translate(-398.783 -2805.262)" style="stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none"/>
+        <g data-name="사각형 69" style="stroke-linejoin:round;stroke:rgb(168, 169, 169);stroke-linecap:round;fill:none">
+            <path style="stroke:none" d="M0 0h10.691v3.055H0z" transform="translate(0 1.557)"/>
+            <path style="fill:none" d="M.5.5h9.691v2.055H.5z" transform="translate(0 1.557)"/>
+        </g>
+    </g>
+</svg>

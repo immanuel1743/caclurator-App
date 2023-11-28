@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="345" height="165" viewBox="0 0 345 165">
+    <defs>
+        <filter id="nzkrdij2td" x="-232.081" y="-213.912" width="827.454" height="535.875" filterUnits="userSpaceOnUse">
+            <feOffset dy="3"/>
+            <feGaussianBlur stdDeviation="45" result="blur"/>
+            <feFlood flood-color="#fff" flood-opacity=".102"/>
+            <feComposite operator="in" in2="blur"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="x935a2ktyf" x="-228.959" y="-206.164" width="736.974" height="529.693" filterUnits="userSpaceOnUse">
+            <feOffset dy="3"/>
+            <feGaussianBlur stdDeviation="45" result="blur-2"/>
+            <feFlood flood-color="#fff" flood-opacity=".149"/>
+            <feComposite operator="in" in2="blur-2"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="daout7yhah" x="-216.771" y="-183.921" width="630.321" height="448.093" filterUnits="userSpaceOnUse">
+            <feOffset dy="3"/>
+            <feGaussianBlur stdDeviation="45" result="blur-3"/>
+            <feFlood flood-color="#fff" flood-opacity=".102"/>
+            <feComposite operator="in" in2="blur-3"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="e1j654fjwi" x="-135.543" y="-125.097" width="503.804" height="299.036" filterUnits="userSpaceOnUse">
+            <feOffset dy="3"/>
+            <feGaussianBlur stdDeviation="40" result="blur-4"/>
+            <feFlood flood-color="#fff" flood-opacity=".102"/>
+            <feComposite operator="in" in2="blur-4"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <linearGradient id="2w3cpez5ca" x1="1" y1="1" x2=".011" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#4053c2"/>
+            <stop offset=".172" stop-color="#567cd3"/>
+            <stop offset=".394" stop-color="#5690d3"/>
+            <stop offset=".581" stop-color="#5baac2"/>
+            <stop offset=".798" stop-color="#5bc2c2"/>
+            <stop offset="1" stop-color="#76d4b0"/>
+        </linearGradient>
+        <linearGradient id="348sc7lrye" x1=".367" y1=".969" x2=".125" y2=".111" xlink:href="#2w3cpez5ca"/>
+        <linearGradient id="sdhns5laxg" x1=".956" y1="0" x2=".017" y2=".611" xlink:href="#2w3cpez5ca"/>
+        <clipPath id="0jea12b9fb">
+            <rect data-name="사각형 17" width="345" height="165" rx="15" transform="translate(420 -185)" style="fill:#fff"/>
+        </clipPath>
+        <clipPath id="w5i5y4jixc">
+            <path data-name="사각형 16" style="fill:#fff" d="M0 0h345v165H0z"/>
+        </clipPath>
+    </defs>
+    <g data-name="마스크 그룹 8" transform="translate(-420 185)" style="clip-path:url(#0jea12b9fb)">
+        <g data-name="그룹 21">
+            <g data-name="마스크 그룹 7" transform="translate(420 -185)" style="clip-path:url(#w5i5y4jixc)">
+                <g data-name="그룹 18">
+                    <g data-name="그룹 17">
+                        <path data-name="사각형 15" style="fill:url(#2w3cpez5ca)" d="M0 0h345v165H0z"/>
+                        <g style="filter:url(#nzkrdij2td)">
+                            <path data-name="패스 24" d="M540.427 91.216 127.466.011S-129.5 185.368 86.311 222.993 542.847 95.79 542.847 95.79" transform="rotate(-4 -679.462 1368.2)" style="fill:url(#348sc7lrye);opacity:.15"/>
+                        </g>
+                        <g style="filter:url(#x935a2ktyf)">
+                            <path data-name="패스 25" d="M438.808 72.663S170.44-20.275 82.712 4.1s-129.043 135.409-4.087 174.839S441.426 77.3 441.426 77.3" transform="rotate(-9.8 -32.9 549.968)" style="fill:url(#sdhns5laxg);opacity:.15"/>
+                        </g>
+                        <g style="filter:url(#daout7yhah)">
+                            <path data-name="패스 26" d="M342.7 48.024S133.539-12.912 64.948 2.527s-101.293 87-3.89 112.886 283.666-64.389 283.666-64.389" transform="rotate(-9.8 5.109 481.534)" style="opacity:.25;fill:url(#sdhns5laxg)"/>
+                        </g>
+                        <g style="filter:url(#e1j654fjwi)">
+                            <path data-name="패스 27" d="M263.8 0H0v57.919S52.332 72.022 263.8 0" transform="translate(-15.536 -8.104)" style="opacity:.32;fill:url(#sdhns5laxg)"/>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
