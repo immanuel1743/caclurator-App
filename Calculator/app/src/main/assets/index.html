@@ -4,54 +4,62 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, minimum-scale=1, maximum-scale=1" />
   <title>CALCULATOR</title>
-  <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.js"></script>
-  <script type="text/javascript" src="js/html2canvas.js"></script>
-  <script type="text/javascript" src="js/main.js"></script>
+  <script src="js/html2canvas.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/accessibility.js"></script>
   <link href="style.css" rel="stylesheet">
 </head>
-<body>
-  <div class="splash"><img src="img/calc.svg"></div>
+<body><div class="splash"><img src="img/calc.svg"></div>
   <div class="layer_main">
     <div class="title"> 
-      <img src="img/menu.svg" class="extra" onclick="showMenu()" >
-      <div>부동산 계산기</div>
+      <img src="img/menu.svg" class="extra" onclick="showMenu()" role="button" aria-label="더보기">
+      <div class="aria-txt">부동산 계산기</div>
     </div>
-    <div class="sort_list"><div onclick="sortList(this)">최신순</div></div>
+    <div class="option_box">
+      <div class="sort_list"><div onclick="sortList(this)" role="button" class="sort_btn">최신순</div></div>
+      <div class="tab_pannel">
+        <div role="button" onclick="showType(this)">모두보기</div>
+        <div role="button" onclick="showType(this)">전세자금</div>
+        <div role="button" onclick="showType(this)">중개보수</div>
+        <div role="button" onclick="showType(this)">중도상환</div>
+      </div>
+    </div>
     <div class="record_list"><div class="record_cons"></div></div>
-    <div class="add_btn" onclick="showCalc()">+ 새로운 계산기</div>
+    <div class="add_btn" onclick="showCalc()" role="button"><span class="aria-hidden">+ </span>새로운 계산기</div>
   </div>
   <div class="record_popup popup">
     <div class="popup_title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideRecordPopup()"></i>
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideRecordPopup()" role="button" aria-label="뒤로"></i>
       <div class="popup_record_title">지난 계산 기록</div>
     </div>
     <div class="popup_main">
       <div class="popup_desc" id="popup_desc"></div>
     </div>
+    <div class="share_btns"></div>
   </div>
   <div class="calc popup">
     <div class="calc_title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideCalc()">
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideCalc()" role="button" aria-label="뒤로">
       <input type="text" class="edit_box" id="popupTitle" onfocus="this.blur()" readonly value="계산기" maxlength="15" onpaste="return false;" oninput="maxLengthChk(this)">
-      <img src="img/edit.svg" class="edit_btn" onclick="editTitle(this)" >
+      <img src="img/edit.svg" class="edit_btn" onclick="editTitle(this)" role="button">
     </div>
     <div class="calc_desc">
       <div class="calc_tab">
-        <div class="tab active" onclick="showCalcDetail(this)">전세자금대출</div>
-        <div class="tab" onclick="showCalcDetail(this)">부동산 중개보수</div>
-        <div class="tab" onclick="showCalcDetail(this)">중도상환 수수료</div>
+        <div class="tab active" onclick="showCalcDetail(this)" role="tab" aria-selected="true">전세자금대출</div>
+        <div class="tab" onclick="showCalcDetail(this)" role="tab" aria-selected="false">부동산 중개보수</div>
+        <div class="tab" onclick="showCalcDetail(this)" role="tab" aria-selected="false">중도상환 수수료</div>
       </div>
       <div class="calc_box"></div>
     </div>
     <div class="calc_btns">
-      <div class="reset_btn" onclick="refreshInput()">초기화</div>
-      <div class="calc_btn" onclick="calculating()">계산하기</div>
+      <div class="reset_btn" onclick="refreshInput()" role="button">초기화</div>
+      <div class="calc_btn" onclick="calculating()" role="button">계산하기</div>
     </div>
   </div>
   <div class="monthly_table popup depth">
     <div class="monthly_title title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideMonthly()"></i>
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideMonthly()" role="button" aria-label="뒤로"></i>
       <div>월별 상환금과 대출잔금
         <span class="momthly_notice notice"></span>
       </div> 
@@ -68,7 +76,7 @@
   </div>
   <div class="menu_popup popup">
     <div class="title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideMenu()"></i>
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideMenu()" role="button" aria-label="뒤로"></i>
       <div>더 보기</div>
     </div>
     <div class="menu_desc">
@@ -78,20 +86,25 @@
   </div>
   <div class="extra_popup popup depth">
     <div class="popup_title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideExtra()"></i>
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideExtra()" role="button" aria-label="뒤로"></i>
       <div>자주 묻는 질문</div>
     </div>
     <div class="extra_tabs">
-      <div class="extra_tab all active" onclick="showQna(this)">전체</div>
-      <div class="extra_tab" onclick="showQna(this)">전세자금대출</div>
-      <div class="extra_tab" onclick="showQna(this)">부동산 중개보수</div>
-      <div class="extra_tab" onclick="showQna(this)">중도상환 수수료</div>
+      <div class="extra_tab_slider">
+        <div class="extra_tab all active" onclick="showQna(this)">전체</div>
+        <div class="extra_tab" onclick="showQna(this)">전세자금대출</div>
+        <div class="extra_tab" onclick="showQna(this)">부동산 중개보수</div>
+        <div class="extra_tab" onclick="showQna(this)">중도상환 수수료</div>
+        <div class="extra_tab" onclick="showQna(this)">전세자금대출</div>
+        <div class="extra_tab" onclick="showQna(this)">부동산 중개보수</div>
+        <div class="extra_tab" onclick="showQna(this)">중도상환 수수료</div>
+      </div>
     </div>
     <div class="extra_desc"></div>
   </div>
   <div class="oss_popup popup depth">
     <div class="title">
-      <img src="img/back_arrow.svg" class="back_btn" onclick="hideOss()"></i>
+      <img src="img/back_arrow.svg" class="back_btn" onclick="hideOss()" role="button" aria-label="뒤로"></i>
       <div>오픈소스 라이선스</div>
     </div>
     <div class="oss_desc">
