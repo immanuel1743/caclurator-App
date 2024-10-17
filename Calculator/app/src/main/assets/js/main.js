@@ -12,56 +12,75 @@ var html = "",
 let orgRecord,
     newest;
 
-window.onload = function () {
-  $(".splash").fadeIn();
+document.addEventListener('DOMContentLoaded', function() {
+  var splashBoard = document.querySelector('.splash');
+
+  fadeIn(splashBoard);
+
   setTimeout(() => {
-    $(".splash").fadeOut();
-    $('.add').show();
-  }, "1000");
+    fadeOut(splashBoard);
+  }, "1500");
 
   if(getLocalRecod === '[]' || getLocalRecod === null || getLocalRecod === undefined || getLocalRecod === '') {
     orgRecord = [];
     setNoRecord();
   } else {
+    var recordCons = document.querySelector('.record_cons'),
+        sortList = document.querySelector('.sort_list');
+
     orgRecord = JSON.parse(localStorage.getItem('record'));
 
     if(getNewest === null || getNewest === 'false') {
       newest = false;
       localStorage.setItem("newest", JSON.stringify(newest));
-      $('.record_cons').removeClass('active');
-      $('.sort_list').find('div').removeClass('active');
-      $('.sort_list').find('div').html('과거순');
+      recordCons.classList.remove('active');
+      sortList.parentNode.querySelector('div').classList.remove('active');
+      sortList.children[0].innerHTML = '과거순';
     } else {
       getNewest = localStorage.getItem('newest');
 
-      if(newest !== false) {
-        $('.record_cons').addClass('active');
-        $('.sort_list').find('div').addClass('active');
-        $('.sort_list').find('div').html('최신순');
+      if (newest !== false) {
+        recordCons.classList.add('active');
+        sortList.parentNode.querySelector('div').classList.add('active');
+        sortList.children[0].innerHTML = '최신순';
+        sortList.children[0].classList.add('active')
       } else {
-        $('.slider, .record_cons').removeClass('active');
-        $('.sort_list').find('div').html('과거순');
+        recordCons.classList.remove('active');
+        sortList.children[0].innerHTML = '과거순';
       }
     }
     setRecordList();
-    $('.add_btn').show();
+    document.querySelector('.add_btn').style.display = 'block';
   }
-};
+});
 
 function setNoRecord() {
-  html = "<div class='no_record'><img src='img/no_record.svg'>저장된 계산 기록이 없습니다.<br>아래의 새로운 계산기 버튼을 눌러보세요.<div class='calc_shorcut' onclick='showCalc()'>+ 새로운 계산기</div></div>";
-  $('.sort_list').hide();
-  $(".record_cons").html(html);
-  $(".slider, .record_cons").removeClass('active');
+  var sortList = document.querySelector('.sort_list'),
+      recordCons = document.querySelector('.record_cons'),
+      addBtn = document.querySelector('.add_btn');
+
+  html =
+    `<div class='no_record'>
+      <img src='img/no_record.svg'>저장된 계산 기록이 없습니다.<br>
+      아래의 새로운 계산기 버튼을 눌러보세요.<div class='calc_shorcut' onclick='showCalc()'>+ 새로운 계산기</div>
+    </div>`;
+
+  sortList.style.display = 'none';
+  addBtn.style.display = 'none';
+
+  recordCons.innerHTML = html;
+  recordCons.classList.remove('active');
   localStorage.clear();
-  $('.add_btn').hide();
-}
+};
 
-function setRecordList() {
+function setRecordList(tabList) {
   html = "";
-
-  $('.sort_list').show();
-  orgRecord.forEach(function (record) {
+  document.querySelector('.sort_list').style.display = 'block',
+  branch = null;
+  
+  if (tabList !== undefined) branch = tabList;
+  else branch = orgRecord;
+  branch.forEach(function (record) {
     if(record.type === '전세자금대출') {
       html +=
       '<div class="record_box bg_1" id=' +
@@ -78,12 +97,12 @@ function setRecordList() {
       record.id +
       '>';
     }
-    html +=  '<div class="record_title" onclick="showRecordPopup(' +
+    html +=  '<div class="record_title aria-hidden" onclick="showRecordPopup(' +
       record.id +
       ')">' +
       record.title +
       '</div>\
-        <div class="record_desc" onclick="showRecordPopup(' +
+        <div class="record_desc aria-hidden" onclick="showRecordPopup(' +
       record.id +
       ')">';
       html +=
@@ -123,7 +142,7 @@ function setRecordList() {
       '</div>\
         <div class="space_bar"></div>\
         <div class="record_delete list_delete">\
-          <div class="record_date" onclick="showRecordPopup(' +
+          <div class="record_date aria-hidden" onclick="showRecordPopup(' +
       record.id +
       ')">' +
       record.date +
@@ -134,103 +153,133 @@ function setRecordList() {
         </div>\
       </div>';
 
-    $(".record_cons").html(html);
+    document.querySelector('.record_cons').innerHTML = html;
   });
 
-  $('.add_btn').show();
-}
+  document.querySelector('.add_btn').style.display = 'block';
+};
 
 function saveRecord() {
   localStorage.setItem("record", JSON.stringify(orgRecord));
-}
+};
 
 function deletRecord(id) {
-  var getRecordBox = $("#" + id + "");
+  var getRecordBox = document.getElementById(JSON.stringify(id)),
+      recordPopup = document.querySelector('.record_popup'),
+      recordCons = document.querySelector('.record_cons');
 
-  $(".record_popup").animate({'left' : '100%'}, 150);
-  getRecordBox.fadeOut(function () {
-    getRecordBox.remove();
-  });
+  animate(recordPopup, 'left', '100%');
+  fadeOut(getRecordBox);
 
-  if ($(".record_cons").children().length === 1) setNoRecord();
+  if (recordCons.childNodes.length === 1) setNoRecord();
 
   orgRecord = orgRecord.filter((newRecord) => newRecord.id !== parseInt(id));
   saveRecord();
-}
+};
 
 function selectTerm(e) {
-  var getType = $(e).text(),
-    getText = $(e).parent(".select_box").siblings("div").find(".change.mark"),
-    getInput = $(e).parent(".select_box").siblings("div").find("input"),
-    getValue = getInput.val(),
-    fixValue = "";
+  var getType = e.innerHTML,
+      getText = e.parentElement.nextElementSibling.querySelector('.change.mark'),
+      getInput = e.parentElement.nextElementSibling.querySelector('input'),
+      getValue = getInput.value,
+      calcBtn = document.querySelector('.calc_btn'),
+      resetBtn = document.querySelector('.reset_btn'),
+      sum = document.querySelector('.sum'),
+      fixValue = "";
 
-  $(e).addClass("active");
-  $(e).siblings().removeClass("active");
-  $(e).attr("onclick", "selectTerm(this)");
-  $(".calc_btn").html("계산하기");
-  $(".calc_btn").attr("onclick", "calculating()");
-  $(".calc_btn").show();
-  $(".calc_btn").removeClass('active');
-  $(".reset_btn").removeClass('center');
-  $(".sum").hide();
+  e.classList.add('active');
+  e.setAttribute('onclick', 'calculating()');
+  e.setAttribute('aria-selected', true);
 
-  if ($(e).hasClass("active")) {
-    $(e).attr("onclick", "");
-    $(e).siblings().attr("onclick", "selectTerm(this)");
+  for (let sibling of e.parentNode.children) {
+    if (sibling !== e) {
+      sibling.classList.remove('active');
+      sibling.setAttribute('aria-selected', false);
+    }
   }
 
+  calcBtn.innerHTML = '계산하기';
+  calcBtn.style.display = 'flex';
+  calcBtn.classList.remove = 'active';
+  resetBtn.classList.remove = 'center';
+  calcBtn.setAttribute('onclick', 'calculating()');
+  sum.style.display = 'none';
+
+  if (e.classList.contains('active')) {
+    e.setAttribute('onclick', '');
+    for (let sibling of e.parentNode.children) {
+      if (sibling !== e) sibling.setAttribute('onclick', 'selectTerm(this)');
+    }
+  }
 
   if (getType === "년" || getType === "개월") {
-    getText.html(getType);
+    getText.innerHTML = getType;
     if (getType === "년") {
       getValue = getValue / 12;
-      getInput.removeClass("padding");
-      getInput.attr('maxlength', '2');
+      getInput.classList.remove('padding');
+      getInput.setAttribute('maxlength', 2);
     } else {
-      (getValue = getValue * 12), getInput.addClass("padding");
-      getInput.attr('maxlength', '3');
+      (getValue = getValue * 12), getInput.classList.add('padding');
+      getInput.setAttribute('maxlength', 3)
     }
     fixValue = getValue.toFixed(0);
-    if (fixValue !== "0") getInput.val(fixValue);
+    if (fixValue !== "0") getInput.value = fixValue;
   }
-}
+};
 
 function select(e) {
-  var getType = $(e).html();
+  var getType = e.innerHTML,
+      calcBtn = document.querySelector('.calc_btn'),
+      tag = document.querySelector('.tag'),
+      selectEl = document.querySelector('select'),
+      nationwide = document.querySelector('.nationwide'),
+      subTab = document.querySelector('.subtab');
 
-  $(e).addClass("active");
-  $(e).siblings().removeClass("active");
-  $(".calc_btn").removeClass('active');
-  $(".sum").hide();
+  e.classList.add('active');
+  e.setAttribute('aria-selected', true);
+  for (let sibling of e.parentNode.children) {
+    if (sibling !== e) {
+      sibling.classList.remove('active');
+      sibling.setAttribute('aria-selected', false);
+    }
+  }
 
-  if ($(e).hasClass("active")) {
-    $(".calc_btn").html("계산하기");
-    $(".calc_btn").attr("onclick", "calculating()");
+  document.querySelector('.sum').style.display = 'none';
+  var localSeoul = document.querySelector('option[value="서울시"]'),
+      getOptions = document.querySelectorAll('option');
+
+  if (e.classList.contains('active')) {
+    calcBtn.innerHTML = '계산하기';
+    calcBtn.setAttribute('onclick', 'calculating()');
   }
 
   if(getType === '주택') {
-    $('.tag').html('주택의 부속토지, 주택분양권 포함');
-    $('select').prop('disabled', false);
-    $('.nationwide').hide();
-    $('option:first-child').prop('selected', true);
+    tag.innerHTML = '주택의 부속토지, 주택분양권 포함';
+    selectEl.removeAttribute('disabled');
+    selectEl.setAttribute('aria-disabled', false);
+    nationwide.style.display = 'none';
+    nationwide.setAttribute('selected', false);
   }
   else if(getType === '오피스텔') {
-    $('.tag').html('부엌화장실등의 시설을 갖춘 전용면적 85㎡ 이하 오피스텔');
-    $('select').prop('disabled', true);
-    $('.nationwide').show();
-    $('.nationwide').prop('selected', true);
+    tag.innerHTML = '부엌화장실등의 시설을 갖춘 전용면적 85㎡ 이하 오피스텔';
+    selectEl.setAttribute('disabled', true);
+    selectEl.setAttribute('aria-disabled', true);
+    nationwide.style.display = 'block';
+    nationwide.setAttribute('selected', true);
   }
   else if(getType === '주택 외'){
-    $('.tag').html('오피스텔(주거용 제외). 상가, 토지 등');
-    $('select').prop('disabled', true);
-    $('.nationwide').show();
-    $('.nationwide').prop('selected', true);
+    tag.innerHTML = '오피스텔(주거용 제외). 상가, 토지 등';
+    selectEl.setAttribute('disabled', true);
+    selectEl.setAttribute('aria-disabled', true);
+    nationwide.style.display = 'block';
+    nationwide.setAttribute('selected', true);
   }
 
-  if(getType === '주택' || getType === '오피스텔' || getType === '주택 외') {
-    $('.subtab').addClass("active");
-    $('.subtab').siblings().removeClass("active");
+  if (getType === '주택' || getType === '오피스텔' || getType === '주택 외') {
+    subTab.classList.add('active');
+     for (let sibling of subTab.parentNode.children) {
+      if (sibling !== subTab) sibling.classList.remove('active');
+     }
   }
 
   html = '';
@@ -263,67 +312,83 @@ function select(e) {
   } else {
     html =
       '<div class="step_one step_hide">거래금액\
-        <input type="text" name="거래금액" class="except" inputmode="numeric" onfocus="checkFocus()" maxlength="12" onkeyup="addQuote(this)"><small class="mark" onpaste="return false;">원</small>\
+        <input type="text" title="거래금액" name="거래금액" class="except" inputmode="numeric" onfocus="checkFocus()" maxlength="12" onkeyup="addQuote(this)"><small class="mark" onpaste="return false;">원</small>\
       </div>\
        <div class="step_third">협의보수율\
-         <input name="협의보수율" type="text" id="interestRate" onkeyup="addQuote(this)" inputmode="numeric" onfocus="checkFocus()" maxlength="8" class="except">\
+         <input title="협의보수율" name="협의보수율" type="text" id="interestRate" onkeyup="addQuote(this)" inputmode="numeric" onfocus="checkFocus()" maxlength="8" class="except">\
          <small class="mark">%</small>\
        </div>\
        <span class="notice">협의보수율을 입력하지 않거나, 상한요율보다 높으면 상한요율이 적용됩니다.</span>';
-  } 
-  $('.change_steps').html(html)
-}
+  }
+
+  if (document.querySelector('.tab.active').innerHTML == '부동산 중개보수') {
+    document.querySelector('.change_steps').innerHTML = html;
+  }
+};
 
 function refreshInput() {
   var getAllInput = document.querySelectorAll("input:not(.edit_box)");
   for (var i = 0; i < getAllInput.length; i++) {
     getAllInput[i].value = null;
   }
-  $(".sum").hide();
-  $(".calc_btn").show();
-  $(".calc_btn").html("계산하기");
-  $(".reset_btn").removeClass("center active");
-  $(".calc_btn").attr("onclick", "calculating()");
-  $('.calc_btn').removeClass('active');
-}
+
+  document.querySelector('.sum').style.display = 'none';
+  document.querySelector('.calc_btn').style.display = 'flex';
+  document.querySelector('.calc_btn').innerHTML = '계산하기';
+  document.querySelector('.reset_btn').classList.remove('center', 'active');
+  document.querySelector('.calc_btn').setAttribute('onclick', 'calculating()');
+  document.querySelector('.calc_btn').classList.remove('active');
+};
 
 function showCalcDetail(e) {
-  var getValue = $(e).text();
-  if ($(e).hasClass("active")) {
-    return;
-  } else {
-    $(e).addClass("active");
+  var getValue = e.innerHTML;
+
+  e.setAttribute('aria-selected', true);
+  if(e.classList.contains('active')) return;
+  else {
+    e.classList.add('active');
     if (getValue === "전세자금대출") setCharterHtml();
     else if (getValue === "중도상환 수수료") setRepaymentHtml();
     else setEstateHtml();
   }
-  $(e).siblings().removeClass("active");
+
+  for (let sibling of e.parentNode.children) {
+    if (sibling !== e) {
+      sibling.classList.remove('active');
+      sibling.setAttribute('aria-selected', false);
+    }
+  }
+
   checkFocus();
-}
+};
 
 function setCharterHtml() {
+  var calcBox = document.querySelector('.calc_box'),
+      resetBtn = document.querySelector('.reset_btn'),
+      calcBtn = document.querySelector('.calc_btn');
+      
   html =
     '<div class="steps">\
     <div class="step_one">대출금액\
-      <input name="대출금액" type="text" pattern="[0-9]*" inputmode="numeric" maxlength="12" onfocus="checkFocus()" onkeyup="addQuote(this)"  onpaste="return false;"><small class="mark">원</small>\
+      <input title="대출금액" name="대출금액" type="text" pattern="[0-9]*" inputmode="numeric" maxlength="12" onfocus="checkFocus()" onkeyup="addQuote(this)"  onpaste="return false;"><small class="mark">원</small>\
       <div class="as_loan"></div>\
     </div>\
     <div class="step_two">대출기간\
       <div class="select_box">\
-        <div class="year active">년</div>\
-        <div class="month" onclick="selectTerm(this)">개월</div>\
+        <div class="year active" role="tab" aria-selected="true">년</div>\
+        <div class="month" role="tab" aria-selected="false" onclick="selectTerm(this)">개월</div>\
       </div>\
       <div><input name="대출기간" type="text" class="change input" inputmode="numeric" maxlength="2" onfocus="checkFocus()"  onpaste="return false;"><small class="change mark">년</small></div>\
     </div>\
     <div class="step_third">연이자율\
-      <input name="연이자율" type="text" maxlength="2" inputmode="numeric" onfocus="checkFocus()"  onpaste="return false;">\
+      <input title="연이자율" name="연이자율" type="text" maxlength="2" inputmode="numeric" onfocus="checkFocus()"  onpaste="return false;">\
       <small class="mark">%</small>\
     </div>\
     <div class="step_four">상환방법\
       <div class="select_box repay_method">\
-        <div class="select_one active" onclick="select(this)">원리금균등</div>\
-        <div class="select_two" onclick="select(this)">원금균등</div>\
-        <div class="select_third" onclick="select(this)">만기일시</div>\
+        <div class="select_one active" onclick="select(this)" role="tab" aria-selected="true">원리금균등</div>\
+        <div class="select_two" onclick="select(this)" role="tab" aria-selected="false">원금균등</div>\
+        <div class="select_third" onclick="select(this)" role="tab" aria-selected="false">만기일시</div>\
       </div>\
     </div>\
   </div>\
@@ -331,20 +396,20 @@ function setCharterHtml() {
   <div class="sum">\
   </div>';
 
-  $(".calc_box").html(html);
-  $(".reset_btn").removeClass("center");
-  $(".calc_btn").removeClass("active");
-  $(".calc_btn").show();
-}
+  calcBox.innerHTML = html;
+  resetBtn.classList.remove('center');
+  calcBtn.classList.remove('active');
+  calcBtn.style.display = 'flex'
+};
 
 function setEstateHtml() {
   html =
     '<div class="steps">\
     <div class="step_four property_tab">매물유형\
       <div class="select_box">\
-        <div class="active" onclick="select(this)">주택</div>\
-        <div onclick="select(this)">오피스텔</div>\
-        <div onclick="select(this)">주택 외</div>\
+        <div class="active" onclick="select(this)" role="tab" aria-selected="true">주택</div>\
+        <div onclick="select(this)" role="tab" aria-selected="false">오피스텔</div>\
+        <div onclick="select(this)" role="tab" aria-selected="false">주택 외</div>\
         <small></small>\
       </div>\
     </div>\
@@ -374,9 +439,9 @@ function setEstateHtml() {
     </div>\
     <div class="step_four trans_tab">거래유형\
       <div class="select_box">\
-        <div class="subtab active" onclick="select(this)">매매/교환</div>\
-        <div onclick="select(this)">전세</div>\
-        <div onclick="select(this)">월세</div>\
+        <div class="subtab active" onclick="select(this)" role="tab" aria-selected="true">매매/교환</div>\
+        <div onclick="select(this)" role="tab" aria-selected="false">전세</div>\
+        <div onclick="select(this)" role="tab" aria-selected="false">월세</div>\
       </div>\
     </div>\
     <section class="change_steps">\
@@ -394,31 +459,31 @@ function setEstateHtml() {
   <div class="sum">\
   </div>';
 
-  $(".calc_box").html(html);
-}
+  document.querySelector('.calc_box').innerHTML = html;
+};
 
 function setRepaymentHtml() {
   html =
     '<div class="steps">\
     <div class="step_one">상환금액\
-      <input name="상환금액" type="text" pattern="[0-9]*" inputmode="numeric" maxlength="12" onkeyup="addQuote(this)" onfocus="checkFocus()" onpaste="return false;"><small class="mark">원</small>\
+      <input title="상환금액" name="상환금액" type="text" pattern="[0-9]*" inputmode="numeric" maxlength="12" onkeyup="addQuote(this)" onfocus="checkFocus()" onpaste="return false;"><small class="mark">원</small>\
     </div>\
     <div class="step_two">대출기간\
       <div class="select_box loan_select">\
-        <div class="year active">년</div>\
-        <div class="month" onclick="selectTerm(this)">개월</div>\
+        <div class="year active" role="tab" aria-selected="true">년</div>\
+        <div class="month" onclick="selectTerm(this)" role="tab" aria-selected="false">개월</div>\
       </div>\
-      <div><input name="대출기간" type="text" inputmode="numeric" class="change input" onfocus="checkFocus()" maxlength="2" onpaste="return false;"><small class="change mark">년</small></div>\
+      <div><input title="대출기간" name="대출기간" type="text" inputmode="numeric" class="change input" onfocus="checkFocus()" maxlength="2" onpaste="return false;"><small class="change mark">년</small></div>\
     </div>\
     <div class="step_two">잔존기간\
       <div class="select_box remain_select">\
-        <div class="year active">년</div>\
-        <div class="month" onclick="selectTerm(this)">개월</div>\
+        <div class="year active" role="tab" aria-selected="true">년</div>\
+        <div class="month" onclick="selectTerm(this)" role="tab" aria-selected="false">개월</div>\
       </div>\
-      <div><input name="잔존기간" type="text" inputmode="numeric" class="change input" onfocus="checkFocus()" maxlength="2" onpaste="return false;"><small class="change mark">년</small></div>\
+      <div><input title="잔존기간" name="잔존기간" type="text" inputmode="numeric" class="change input" onfocus="checkFocus()" maxlength="2" onpaste="return false;"><small class="change mark">년</small></div>\
     </div>\
     <div class="step_third">수수료율\
-      <input name="수수로율" type="text" inputmode="numeric" onfocus="checkFocus()" maxlength="3" onpaste="return false;">\
+      <input title=""수수료율 name="수수로율" type="text" inputmode="numeric" onfocus="checkFocus()" maxlength="3" onpaste="return false;">\
       <small class="mark">%</small>\
     </div>\
   </div>\
@@ -426,8 +491,8 @@ function setRepaymentHtml() {
   <div class="sum">\
   </div>';
 
-  $(".calc_box").html(html);
-}
+  document.querySelector('.calc_box').innerHTML = html;
+};
 
 function saveRecordList(newRecord) {
   orgRecord.push(newRecord);
@@ -435,32 +500,38 @@ function saveRecordList(newRecord) {
   saveRecord();
   showToast('저장이 완료되었습니다');
 
-  $(".reset_btn").addClass("center");
-  $(".calc_btn").hide();
+  var resetBtn = document.querySelector('.reset_btn'),
+      calcBtn = document.querySelector('.calc_btn'),
+      editBox = document.querySelector('.edit_box');
 
-  $(".edit_box").prop("readonly", true);
-  $(".edit_box").attr("onfocus", "this.blur()");
-  $(".edit_box").blur();
-  $(".edit_btn").removeClass("active");
+  resetBtn.classList.add('center');
+  calcBtn.style.display = 'none';
+  editBox.setAttribute('readonly', false);
+  editBox.setAttribute('onfocus', 'this.blur()');
+  editBox.classList.remove('active');
+  editBox.blur;
 }
 
 var upper = '';
 function calculating() {
   var getCate = document.querySelectorAll(".tab"),
       getSteps = document.querySelectorAll("input:not(.edit_box)"),
-      getTitle = $(".edit_box").val();
+      getTitle = document.querySelector('.edit_box'),
+      sum = document.querySelector('.sum'),
+      calcBtn = document.querySelector('.calc_btn'),
+      month = document.querySelector('.month');
 
-  if (getTitle === "") {
+  if (getTitle.value === "") {
     showToast('제목을 입력해 주세요');
-    $(".edit_box").focus();
+    getTitle.focus();
     return;
   };
 
   for (var i = 0; i < getCate.length; i++) {
-    var getTabCate = $(".tab.active").html();
+    var getTabCate = document.querySelector('.tab.active').innerHTML;
     for (var i = 0; i < getSteps.length; i++) {
       var getStepType = getSteps[i].name,
-      getStepVal = Number(getSteps[i].value); 
+      getStepVal = Number(getSteps[i].value);
 
       if (getStepVal === "" || getStepVal <= 0) {
         if(getStepType === '월세') {
@@ -470,22 +541,23 @@ function calculating() {
           showToast(""+getStepType+"을 입력해 주세요");
           getSteps[i].focus();
         }
-
-        $(".sum").hide();
+        sum.style.display = 'none';
         return;
       } else {
         calcInput = true;
-        $(".sum").show();
-        $(".calc_btn").addClass("active");
+        sum.style.display = 'block';
+        calcBtn.classList.add('active');
       }
-
       calcInput = true;
-      $(".sum").show();
-      $(".calc_btn").addClass("active");
+      sum.style.display = 'block';
+      calcBtn.classList.add('active');
 
-      if($('.month').hasClass('active')) {
-        interestRate = interestRate / 12;
+      if (month) {
+        if(month.classList.contains('active')) {
+          interestRate = interestRate / 12;
+        }
       }
+      
 
       if(getTabCate === '부동산 중개보수') var numPayments = '';
       else var numPayments = (Number(getSteps[2].value) / 10) / 10;
@@ -498,8 +570,10 @@ function calculating() {
           monthCalc =  loanAmountCalc / 12,
           monthSum = monthCalc * interestRate,
           monthsInterest = loanAmount + monthSum;
-          getSubTabCate = $('.property_tab').children('.select_box').children('div.active').html(),
-          getThirdTabCate = $('.trans_tab').children('.select_box').children('div.active').html(),
+          getSubTabCateElement = document.querySelector('.property_tab .select_box div.active'),
+          getSubTabCate = getSubTabCateElement ? getSubTabCateElement.innerHTML : null,
+          getThirdTabCateElement = document.querySelector('.trans_tab .select_box div.active'),
+          getThirdTabCate = getThirdTabCateElement ? getThirdTabCateElement.innerHTML : null;
           rate = '';
 
           if(getSubTabCate === '주택') {
@@ -546,23 +620,26 @@ function calculating() {
             }
             rate = 0.9;
           }
-          
-          var lowRate = Number($('#interestRate').val()),
-              rateNotice = rate;
-          if(lowRate < rate) {
-            rate = lowRate;
-          }
+      if (document.querySelector('#interestRate') != null) {
+        var getLowRate = document.querySelector('#interestRate').value,
+            calcLowRate = Number(getLowRate),
+            rateNotice = rate.toString();
+
+        if(calcLowRate < rate) rate = calcLowRate;
+      }
 
       var brokerage = rate / 100,
           brokerageCalc = loanAmount * brokerage,
           brokerageSum = parseInt(brokerageCalc);
-          brokerageSum = brokerageCalc;
+          brokerageSum = brokerageCalc,
+          selectOne = document.querySelector('.select_one'),
+          year = document.querySelector('.year');
 
       if (getTabCate === "전세자금대출") {
         var numPayments = Number(getSteps[2].value);
   
-        if ($(".select_one").hasClass("active")) {
-          if($('.year').hasClass('active')) interestRate = interestRate * 12;
+        if (selectOne.classList.contains('active')) {
+          if(year.classList.contains('active')) interestRate = interestRate * 12;
           equalCalc = getSteps[2].value;
           
           var monthlyInterestRate = (equalCalc / 12) / 100;
@@ -576,6 +653,8 @@ function calculating() {
               equalSum = loanAmount - principal,
               orgCalcEqual = calcEqual,
               orgEqualMonth = emi,
+              monthlyList = document.querySelector('.monthly_list'),
+              monthlyNotice = document.querySelector('.momthly_notice'),
               html = '';
 
           html =
@@ -585,7 +664,7 @@ function calculating() {
               <div>'+equalSum.toLocaleString('ko-KR')+'</div>\
              </div>';
 
-          $('.monthly_list').html(html);
+          monthlyList.innerHTML = html;
 
           var totalInterest = 0;
           for (let i = 2; i <= interestRate; i++) {
@@ -605,9 +684,8 @@ function calculating() {
              </div>';
 
           }
-          $('.monthly_list').html(html);
-          $('.momthly_notice').html('(원리금균등)');
-
+          monthlyList.innerHTML = html;
+          monthlyNotice.innerHTML = '원리금균등';
           totalInterest = totalInterest / 2 + Math.round(orgCalcEqual);
           totalInterest = Math.round(totalInterest),
           calcSum = loanAmount + totalInterest,
@@ -624,8 +702,8 @@ function calculating() {
             calcSum.toLocaleString('ko-KR') +
           " 원</div></div>";
         }
-        else if ($(".select_two").hasClass("active")) {
-          if($('.year').hasClass('active')) interestRate = interestRate * 12;
+        else if (document.querySelector('.select_two').classList.contains('active')) {
+          if(document.querySelector('.year').classList.contains('active')) interestRate = interestRate * 12;
 
           var equaLoan = loanAmount / interestRate,
               equalCalc = ((getSteps[2].value / 100) / 12),
@@ -635,6 +713,8 @@ function calculating() {
               totalInterest = 0,
               orgCalcEqual = calcEqual,
               orgEqualMonth = equalMonth,
+              monthlyList = document.querySelector('.monthly_list'),
+              monthlyNotice = document.querySelector('.momthly_notice'),
               html = '';
 
           equaLoan = Math.round(equaLoan);
@@ -650,7 +730,7 @@ function calculating() {
               <div>'+equalSum.toLocaleString('ko-KR')+'</div>\
              </div>';
 
-          $('.monthly_list').html(html);
+          monthlyList.innerHTML = html;
 
           var equaLoan = loanAmount / interestRate,
               totalInterest = 0;
@@ -677,8 +757,8 @@ function calculating() {
              </div>';
 
         }
-        $('.monthly_list').html(html);
-        $('.momthly_notice').html('(원금균등)');
+        monthlyList.innerHTML = html;
+        monthlyNotice.innerHTML = '원금균등';
 
         totalInterest = totalInterest / 2 + Math.round(orgCalcEqual);
         calcSum = loanAmount + totalInterest;
@@ -702,8 +782,8 @@ function calculating() {
             '<div>대출원금<div class="sum_one">' +
             getSteps[0].value +
             ' 원</div></div>';
-            if($('.year').hasClass('active')) {
-              html += 
+            if(document.querySelector('.year').classList.contains('active')) {
+              html +=
              '<div class="red">총 대출이자<div class="sum_two">' +
              loanAmountSum.toLocaleString('ko-KR') +
             ' 원</div></div>\
@@ -722,10 +802,10 @@ function calculating() {
               monthsInterest.toLocaleString('ko-KR') +
              " 원</div></div>";
             }
-            html += 
-            '<div class="notice">월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출이자와는 차이가 있습니다.</div>'
+            html +=
+            '<div class="notice">* 월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출이자와는 차이가 있습니다.</div>'
         }
-        if (!$(".select_third").hasClass("active")) {
+        if(!document.querySelector('.select_third').classList.contains('active')) {
           html += '<div class="space_bar"></div>';
           html +=
             '<div class="sum_info">1회차 상환금액<div>' +
@@ -733,12 +813,12 @@ function calculating() {
             " 원</div>\
             </div>\
             <span class='month_btn notice' onclick='showMonthly()'>월별 상환금액 더 보기<img src='img/right_arrow.svg'/></span>\
-            <div class='notice'>월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출 이자와는 차이가 있습니다.</div>";
+            <div class='notice'>* 월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출 이자와는 차이가 있습니다.</div>";
         }
       } else if (getTabCate === "중도상환 수수료") {
-        var getLoanVal = Number($('.loan_select').siblings('div').children('input').val()),
-            getLoanType = $('.loan_select').children('.active').text(),
-            getReminType = $('.remain_select').children('.active').text(),
+        var getLoanVal = Number(document.querySelector('.loan_select').parentNode.children[1].querySelector('input').value),
+            getLoanType = document.querySelector('.loan_select .active').innerHTML;
+            getReminType = document.querySelector('.remain_select .active').innerHTML;
             CalcCharge = Number(getSteps[3].value) / 100,
             getRemainVal = Number(getSteps[2].value);
 
@@ -758,6 +838,7 @@ function calculating() {
            <span class="notice">정확한 수수료율은 대출 계약서를 확인하세요.</span>';
       }
       else {
+        var getSval = document.querySelector('select').value;
         brokerageSum = Math.floor(brokerageSum);
 
         html =
@@ -775,7 +856,7 @@ function calculating() {
           html +=
           '<div class="space_bar"></div>\
             <div class="rate_table">\
-              <div class="rate_title" onclick="showRateChart(this)">중개보수 요율표<small class="rate_type notice">('+$('select').val()+', '+getSubTabCate+', '+getThirdTabCate+')</small>\
+              <div class="rate_title" onclick="showRateChart(this)">중개보수 요율표<small class="rate_type notice">('+getSval+', '+getSubTabCate+', '+getThirdTabCate+')</small>\
               <img src="img/right_arrow.svg">\
               </div>\
               <div class="enforcement notice">2021.10.19 시행 | 공인중개사법 시행규칙 제20조 제1항, 별표1</div>\
@@ -805,8 +886,10 @@ function calculating() {
         }
       }
     }
-    $(".sum").html(html);
-    if(getSubTabCate === '주택') $('.' + upper).addClass('active');
+
+    document.querySelector('.sum').innerHTML = html;
+    upper = '.' + upper;
+    if (getSubTabCate === '주택') document.querySelector(upper).classList.add('active');
     
     var id = Math.floor(new Date().getTime() + Math.random());
 
@@ -814,36 +897,35 @@ function calculating() {
     newRecord.id = id;
     newRecord.type = getTabCate;
     newRecord.date = getDate;
-    newRecord.title = $('.edit_box').val();
+    newRecord.title = document.querySelector('.edit_box').value;
 
     if (getTabCate === "전세자금대출") {
-      var getPayType = $('.step_four').children('.select_box').children('.active'),
-          getStep = $('.repay_method').children('.active').text(),
-          getTerm = $('.change.mark').html(),
+      var getPayType = document.querySelector('.repay_method div.active'),
+          getStep = getPayType.innerHTML,
+          getTerm = document.querySelector('.change.mark').innerHTML,
           interestRate = Number(getSteps[1].value.replaceAll(',', ''));
 
       newRecord.info1 = loanAmount.toLocaleString('ko-KR');
       newRecord.info2 = interestRate + ' ' + getTerm;
       newRecord.info3 = numPayments + ' %';
-      newRecord.info4 = getPayType.html();
-      newRecord.info5 = $('.sum_one').html();
-      newRecord.info6 = $('.sum_two').html();
-      newRecord.info7 = $('.sum_thirds').html();
+      newRecord.info4 = getStep;
+      newRecord.info5 = document.querySelector('.sum_one').innerHTML;
+      newRecord.info6 = document.querySelector('.sum_two').innerHTML;
+      newRecord.info7 = document.querySelector('.sum_thirds').innerHTML;
       
       if(getStep !== '만기일시') {
-        newRecord.info8 = $('.sum_info').children('div').html(); 
+        newRecord.info8 = document.querySelector('.sum_info div').innerHTML;
       }
     } else if(getTabCate === "부동산 중개보수") {
       newRecord.info1 = getSubTabCate;
-      newRecord.info2 = $('select').val() ;
-      newRecord.info3 = $('.active')[4].innerHTML;
+      newRecord.info2 = document.querySelector('select').value;
+      newRecord.info3 = document.querySelector('.select_box div.active').innerHTML;
       newRecord.info4 = loanAmount.toLocaleString('ko-KR');
       newRecord.info5 = getSteps[1].value + ' %';
       newRecord.info6 = brokerageSum.toLocaleString('ko-KR') + ' 원';
       newRecord.info7 = rate + ' %';
       newRecord.info8 = loanAmount.toLocaleString('ko-KR');
       newRecord.info9 = getSteps[0].value;
-
     } else {
       if(getLoanType === '개월') getLoanVal = (getLoanVal * 12) / 12;
       if(getReminType === '개월') getRemainVal = (getRemainVal * 12 ) / 12;
@@ -858,27 +940,19 @@ function calculating() {
       newRecord.info6 = chargeCalc.toLocaleString('ko-KR') + ' 원';
     }
   }
+  var calcBtn = document.querySelector('.calc_btn');
   if (calcInput) {
-    $(".calc_btn").html("저장하기");
-    $(".calc_btn").attr("onclick", "saveRecordList(newRecord)");
+    calcBtn.innerHTML = '저장하기';
+    calcBtn.setAttribute('onclick', 'saveRecordList(newRecord)');
   }
 }
 
-function showExtra() {
-  $(".extra_popup").animate({"left":"0"}, 150);
-  showQna("전체");
-}
-
-function hideExtra() {
-  $(".extra_popup").animate({"left":"100%"}, 150);
-}
-
 function showRecordPopup(id) {
-
   var findRecordDesc = orgRecord.filter((getRecord) => getRecord.id === id),
+      recordPopup = document.querySelector('.record_popup'),
       record = findRecordDesc[0];
 
-  $(".record_popup").animate({"left":"0"}, 150);
+  animate(recordPopup, 'left', 0);
 
   html =
     '<div class="record_title popup_recordTitle"><small>' +
@@ -920,7 +994,7 @@ function showRecordPopup(id) {
         <div class="sum_info">1회차 상환금액<div>' +
         record.info8 + "</div>";
       }
-      html += "</div><div class='notice' style='color: #414141'>월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출 이자와는 차이가 있습니다.</div>";
+      html += "</div><div class='notice' style='color: #414141'>* 월단위로 계산된 이자이기 때문에 일단위로 계산되는 금융기관의 대출 이자와는 차이가 있습니다.</div>";
   } else if (record.type === "부동산 중개보수") {
     html +=
       '<div class="record_desc">\
@@ -929,7 +1003,7 @@ function showRecordPopup(id) {
         record.info1 +
         '</div></div>';
       if(record.info1 === '주택') {
-        html += '<small class="notice">주택의 부속토지 주택분양권 포함</small>';
+        html += '<small class="notice">주택의 부속토지, 주택분양권 포함</small>';
       } else if(record.info1 === '오피스텔') {
         html += '<small class="notice">부엌화장실등의 시설을 갖춘 전용면적 85㎡ 이하 오피스텔</small>';
       } else {
@@ -1004,30 +1078,40 @@ function showRecordPopup(id) {
     '</div>\
   </div></div>';
 
-  $(".popup_desc").html(html);
+  document.querySelector('.popup_desc').innerHTML = html;
 
-  var sharebtn = "<div class='share_btns'>\
-                    <div class='share_btn' onclick='setTimeout(shareRecord(this))'>URL 복사하기<img src='img/url_icon.svg'></div>\
-                    <div class='delete_btn'onclick='deletRecord("+id+")'><img src='img/delte_icon.svg'></div>\
-                  </div>";
-  $('.record_popup').append(sharebtn); 
+  var html = "<div class='share_btn' onclick = 'setTimeout(shareRecord(this))'> URL 복사하기 <img src='img/url_icon.svg'></div >\
+              <div class='delete_btn'onclick='deletRecord("+ id + ")'><img src='img/delte_icon.svg'></div>";
+  
+  document.querySelector('.share_btns').innerHTML = html;
 
-  if(record.type === '중도상환 수수료') $('.share_btn, .record_edit, .popup_desc, .edit_btn').addClass('charge');
-  else if(record.type === '부동산 중개보수') $('.share_btn, .record_edit, .popup_desc, .edit_btn').addClass('brokerage');
-}
+  if (record.type === '중도상환 수수료') {
+    document.querySelector('.share_btn').classList.add('charge');
+    document.querySelector('.record_edit').classList.add('charge');
+    document.querySelector('.popup_desc').classList.add('charge');
+    document.querySelector('.edit_btn').classList.add('charge');
+  }
+  else if (record.type === '부동산 중개보수') {
+    document.querySelector('.share_btn').classList.add('brokerage');
+    document.querySelector('.record_edit').classList.add('brokerage');
+    document.querySelector('.popup_desc').classList.add('brokerage');
+    document.querySelector('.edit_btn').classList.add('brokerage');
+  }
+};
 
 function checkKey(event) {
-  var getTitle = $(".edit_box").val();
+  var editBox = document.querySelector('.edit_box'),
+      getTitle = editBox.value;
 
   if (event.keyCode === 13) {
     if (getTitle === "") {
       showToast('제목을 입력해 주세요');
-      $(".edit_box").focus();
+      editBox.focus;
     } else {
-      $(".edit_box").prop("readonly", true);
-      $(".edit_box").attr("onfocus", "this.blur()");
-      $(".edit_box").blur();
-      $(".edit_btn").removeClass("active");
+      editBox.setAttribute('.readonly', true);
+      editBox.setAttribute('.onfocus', 'this.blur()');
+      editBox.classList.remove('active');
+      editBox.blur;
 
       var findRecordDesc = orgRecord.filter((getRecord) => getRecord.id === id),
           record = findRecordDesc[0];
@@ -1037,74 +1121,100 @@ function checkKey(event) {
       setRecordList();
     }
   }
-}
+};
 
 function editTitleSave(e, id) {
-  var getTitle = $(".edit_box").val();
+  var getTitle = document.querySelector('.edit_box').value,
+      recordTitle = document.querySelector('#recordTitle'),
+      recordCons = document.querySelector('.record_cons');
 
-  $(e).toggleClass("active");
-
-  if ($(e).hasClass("active")) {
-    $('#recordTitle').prop("readonly", false);
-    $('#recordTitle').attr("onfocus", true);
-    $('#recordTitle').focus();
-    setInputCursorPositonToLast($("#recordTitle"));
-  } else {
+  if (e.classList.contains('active')) {
+    e.classList.remove('active');
     if (getTitle === "") {
       showToast('제목을 입력해 주세요');
-      
-      $('#recordTitle').attr("onfocus", true);
-      $('#recordTitle').focus();
-      $(".edit_btn").addClass("active");
+
+      recordTitle.removeAttribute('readonly');
+      recordTitle.setAttribute('onfocus', true);
+      recordTitle.focus();
+      e.classList.add('active');
       return;
     } else {
-      $('#recordTitle').prop("readonly", true);
-      $('#recordTitle').blur();
-      $(".record_cons").html("");
-      $(".edit_btn").removeClass("active");
+      recordTitle.setAttribute('readonly', true);
+      recordTitle.setAttribute('onfocus', 'this.blur()');
+      recordTitle.blur();
 
       var findRecordDesc = orgRecord.filter((getRecord) => getRecord.id === id),
           record = findRecordDesc[0];
 
       record.title = getTitle;
+
       saveRecord();
-      setRecordList();
     }
+  } else {
+    e.classList.add('active');
+    recordTitle.removeAttribute('readonly');
+    recordTitle.removeAttribute('onfocus');
+    recordTitle.focus();
+    recordCons.innerHTML = '';
+
+    setInputCursorPositonToLast(document.querySelector('.edit_box'));
   }
-}
+  setRecordList();
+  setRecordaAcc();
+};
 
 function editTitle(e) {
-  var getTitle = $(".edit_box").val();
+  var getTitle = document.querySelector('#popupTitle').value,
+      popupTitle = document.querySelector('#popupTitle'),
+      editBtn = document.querySelector('.edit_btn'),
+      editBox = document.querySelector('.edit_box');
 
-  $(e).toggleClass("active");
+  if (!e.classList.contains('active')) {
+    e.classList.add('active');
+    popupTitle.removeAttribute('readonly');
+    popupTitle.setAttribute('onfocus', true);
+    popupTitle.focus();
+    editBtn.classList.add('active');
 
-  if ($(e).hasClass("active")) {
-    $('#popupTitle').prop("readonly", false);
-    $('#popupTitle').attr("onfocus", true);
-    $('#popupTitle').focus();
-    $(".edit_btn").addClass("active");
-    setInputCursorPositonToLast($("#popupTitle"));
+    setInputCursorPositonToLast(popupTitle);
   } else {
     if (getTitle === "") {
       showToast('제목을 입력해 주세요');
-      $(".edit_box").focus();
+      editBox.focus;
     } else {
-      $('#popupTitle').prop("readonly", true);
-      $('#popupTitle').attr("onfocus", "this.blur()");
-      $('#popupTitle').blur();
-      $(".edit_btn").removeClass("active");
+      popupTitle.setAttribute('readonly', true);
+      popupTitle.setAttribute('onfocus', 'this.blur()');
+      editBtn.classList.remove('active');
+      popupTitle.blur();
     }
   }
-}
+};
 
 function showQna(e) {
-  var html = "",
-    tabTitle = $(e).html();
+  var html = "";
+      tabTitle = e.innerHTML;
+      
+  if (e !== '전체') {
+    const tabContainer = document.querySelector('.extra_tabs');
+    const tabWidth = e.offsetWidth;
+    const tabLeft = e.offsetLeft;
+    const containerWidth = tabContainer.offsetWidth;
+    const scrollPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
 
-  $(e).addClass("active");
-  $(e).siblings().removeClass("active");
+    tabContainer.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
+  }
 
-  if (tabTitle === "전체" || e === "전체") {
+  if(tabTitle != undefined) {
+    e.classList.add('active');
+    for (let sibling of e.parentNode.children) {
+      if (sibling !== e) sibling.classList.remove('active');
+    }
+  }
+
+  if (e === '전체' || tabTitle === '전체') {
     html +=
       '<div class="q_box" onclick="toggleQna(this)">\
       <div class="q">원리금균등 상환이 뭔가요?<img src="img/open.svg"></div>\
@@ -1192,12 +1302,6 @@ function showQna(e) {
       <div class="q">중도상환 수수료 계산법은 뭔가요?<img src="img/open.svg"></div>\
       <div class="a"><div><div>중도상환 계산 방법은 아래 식으로 계산할 수 있습니다.\
       >중도상환 수수료 = 중도상환액 x 수수료율 x (잔존기간 / 전체 대출기간)</div></div></div>\
-     </div>\
-     <div class="q_box" onclick="toggleQna(this)">\
-      <div class="q">중도상환 수수료 면제기간이 궁금해요!<img src="img/open.svg"></div>\
-      <div class="a"><div><div>일부 대출은 일정 기간이 지나면 >중도상환 수수료를 면제해주기도 합니다.</br>\
-      면제기간이 있는 경우 >중도상환 수수료 계산 방법은 아래와 같습니다.</br>\
-      >중도상환 수수료 = 중도상환액 x 수수료율 x (면제기간까지 남은 기간 / 면제기간)</div></div></div>\
      </div>\
      <div class="q_box" onclick="toggleQna(this)">\
       <div class="q">중도상환 수수료 면제기간이 궁금해요!<img src="img/open.svg"></div>\
@@ -1312,12 +1416,6 @@ function showQna(e) {
     <div class="q">중도상환 수수료 면제기간이 궁금해요!<img src="img/open.svg"></div>\
     <div class="a"><div><div>일부 대출은 일정 기간이 지나면 >중도상환 수수료를 면제해주기도 합니다.</br>\
     면제기간이 있는 경우 >중도상환 수수료 계산 방법은 아래와 같습니다.</br>\
-    >중도상환 수수료 = 중도상환액 x 수수료율 x (면제기간까지 남은 기간 / 면제기간)</div></div></div>\
-   </div>\
-   <div class="q_box" onclick="toggleQna(this)">\
-    <div class="q">중도상환 수수료 면제기간이 궁금해요!<img src="img/open.svg"></div>\
-    <div class="a"><div><div>일부 대출은 일정 기간이 지나면 >중도상환 수수료를 면제해주기도 합니다.</br>\
-    면제기간이 있는 경우 >중도상환 수수료 계산 방법은 아래와 같습니다.</br>\
     >중도상환 수수료 = 중도상환액 x 수수료율 x (면제기간까지 남은 기간 / 면제기간)</br>\
     예를 들어, 주택담보대출을 받고 2년째 되는 날에 1억을 중도상환한다면 아래과 같이 >중도상환 수수료는 50만원으로 계산됩니다.\
     (수수료율 1.5% 가정 시)</br>\
@@ -1330,50 +1428,15 @@ function showQna(e) {
     <div class="a"><div><div>잔존기간은 대출 계약서 작성 시 약정했던 전체 대출기간에서 남은 기간을 의미합니다.\
     예를 들어 전체 대출 기간이 10년이고 현재 2년이 지났다면 잔존기간은 8년입니다.</div></div></div>\
    </div>';
-  }
-  $(".extra_desc").html(html);
-}
+  };
 
-function shareRecord(e){
-  $('.share_btns').addClass('active');
-  $(e).attr('onclick', '');
+  var extraDesc = document.querySelector('.extra_desc');
+  extraDesc.innerHTML = html;
+};
 
-  html2canvas($('.popup_main')[0], {useCORS:true, allowTaint: true, foreignObjectRendering: true, proxy: this._proxyURL, scrollX: window.pageXOffset, scrollY: window.pageYOffset, x: window.pageXOffset, y: window.pageYOffset, width: window.innerWidth}).then(function(canvas){
-    canvas.style.positon = 'fixed';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-
-    var imgData = canvas.toDataURL();
-
-    var sendData = new FormData();
-        sendData.append('data', imgData);
-    
-    $.ajax({
-      cache : false,
-      url : 'http://dev.nuribom.com:10000/pproject/cal/api/upload',
-      processData : false,
-      contentType : false,
-      crossDomain : true,
-      xhrFields: { withCredentials:false },
-      type : 'POST',
-      data : sendData,
-      success : function(resource){
-          var url = resource.url;
-          navigator.clipboard.writeText(url).then(function() {
-          }, function() {
-            clip(url);
-          });
-        $(e).attr('onclick', 'setTimeout(shareRecord(this))');
-        $('.share_btns').removeClass('active');
-        showToast('URL이 복사되었습니다');
-      }, error : function(xhr,status,erorr){
-        showToast('URL 복사에 실패하였습니다');
-        $(e).attr('onclick', 'setTimeout(shareRecord(this))');
-        $('.share_btns').removeClass('active');
-      }
-    });
-  });
-}
+function shareRecord(e) {
+  console.log('shareRecord');
+};
 
 function clip(url){
 	var t = document.createElement("textarea");
@@ -1382,8 +1445,7 @@ function clip(url){
 	t.select();
 	document.execCommand('copy');
 	document.body.removeChild(t);
-}
-
+};
 
 function downloadUri(uri, name){
   var link = document.createElement('a');
@@ -1391,146 +1453,258 @@ function downloadUri(uri, name){
   link.href = uri;
   document.body.appendChild(link);
   link.click();
-}
+};
 
 function checkFocus() {
-  $(".sum").hide();
-  $(".reset_btn").removeClass("center");
-  $(".calc_btn").show();
-  $(".calc_btn").html("계산하기");
-  $(".calc_btn").removeClass("active");
-  $(".calc_btn").attr("onclick", "calculating()");
-}
+  var calcBtn = document.querySelector('.calc_btn');
+  document.querySelector('.sum').style.display = 'none';
+  calcBtn.style.display = 'flex';
+  calcBtn.innerHTML = '계산하기';
+  calcBtn.classList.remove('active');
+  calcBtn.setAttribute('onclick', 'calculating()');
+
+  if(document.querySelector('.reset_btn').classList.contains('center')) document.querySelector('.reset_btn').classList.remove('center');
+};
 
 function addQuote(e){
-  var getVal = $(e).val(),
+  var getVal = e.value,
       getNum = Number(getVal.replaceAll(/,/g, '')),
       quoteNum = getNum.toLocaleString('ko-KR');
 
-  $(e).val(quoteNum);
-}
+  e.value = quoteNum;
+};
 
-function setInputCursorPositonToLast(element) {
+function setInputCursorPositonToLast(e) {
   setTimeout(function () {
-    var inputValLength = element.val().length;
-    element[0].setSelectionRange(inputValLength, inputValLength);
+    var inputValLength = e.value.length;
+    e.setSelectionRange(inputValLength, inputValLength);
   }, 0);
-}
+};
 
 function toggleQna(e) {
-  $(e).toggleClass("active");
-  if ($(e).hasClass("active")) {
-    $(e).siblings().removeClass("active");
-    $(e).siblings().find(".a").slideUp();
-    $(e).siblings().find(".q").find('img').attr('src' , 'img/open.svg');
-    $(e).find(".a").stop().slideDown();
-    $(e).find(".q").find('img').attr('src' , 'img/close.svg');
+  if(e.classList.contains('active')) {
+    e.children[0].children[0].src = 'img/open.svg';
+    e.classList.remove('active');
+    e.children[1].classList.remove('active');
   } else {
-    $(e).find(".a").stop().slideUp();
-    $(e).find(".q").find('img').attr('src' , 'img/open.svg');
+    e.classList.add('active');
+    e.children[1].classList.add('active');
+
+    for (let sibling of e.parentNode.children) {
+      if (sibling !== e) {
+        sibling.classList.remove('active');
+        sibling.children[0].children[0].src = 'img/open.svg';
+        e.children[0].children[0].src = 'img/close.svg';
+        sibling.children[1].classList.remove('active');
+      }
+    }
   }
-}
+};
 
 function maxLengthChk(e){
-  var obj = $(e),
-      maxLength = 15;
+  var maxLength = 15;
   
-	if (obj.val().length > maxLength)
-    obj.val(obj.val().substring(0, maxLength))
-}
+	if (e.value.length > maxLength)
+    e.value = (e.value.substring(0, maxLength))
+};
 
-function sortList(e) {  
-  $(e).toggleClass('active');
-  if($(e).hasClass('active')) {
-    $('.record_cons').addClass('active');
-    $('.sort_list').find('div').html('최신순');
-    newest = true;
-  } else {
-    $('.record_cons').removeClass('active');
-    $('.sort_list').find('div').html('과거순');
+function sortList(e) {
+  var recordCons = document.querySelector('.record_cons'),
+      sortList = document.querySelector('.sort_list div');
+  
+  if (e.classList.contains('active')) {
+    e.classList.remove('active');
+    recordCons.classList.remove('active');
+    sortList.innerHTML = '과거순';
     newest = false;
+  } else {
+    e.classList.add('active');
+    recordCons.classList.add('active');
+    sortList.innerHTML = '최신순';
+    newest = true;
   }
-  $('.record_list').scrollTop(0);
+
+  scrollTo(document.querySelector('.record_list'));
   localStorage.setItem("newest", JSON.stringify(newest));
-}
+};
 
 function hideRecordPopup() {
-  $(".record_popup").animate({"left":"100%"}, 150);
-  $('.share_btn, .record_edit, .popup_desc, .edit_btn').removeClass('charge brokerage');
-  $('.share_btns').remove();
-}
+  var recotdPopup = document.querySelector('.record_popup'),
+      shareBtn = document.querySelector('.share_btns');
+  animate(recotdPopup, 'left', '100%');
 
-function showCalc() {
-  $(".calc").animate({"left":"0"}, 150);
-  $('.record_edit').remove();
-  $('.calc_tab').children('div:first-child').addClass('active');
-  $('.calc_tab').children('div:first-child').siblings().removeClass('active');
-  $('.edit_box').val('계산기');
+  document.querySelector('.share_btn').classList.remove('charge', 'brokerage');
+  document.querySelector('.record_edit').classList.remove('charge', 'brokerage');
+  document.querySelector('.popup_desc').classList.remove('charge', 'brokerage');
+  document.querySelector('.edit_btn').classList.remove('charge', 'brokerage');
+
+  document.querySelector('.share_btns').innerHTML = '';
+};
+
+function showCalc(e) {
+  var calc = document.querySelector('.calc'),
+      calcTab = document.querySelector('.calc_tab'),
+      editBox = document.querySelector('#popupTitle');
+
+  animate(calc, 'left', 0);
+  
+  editBox.value = '계산기';
+  calcTab.childNodes[1].classList.add('active');
+
+  for (let sibling of calcTab.parentNode.children) {
+    if (sibling !== calcTab) {
+      sibling.classList.remove('active');
+    }
+  }
+
   setCharterHtml();
-}
+};
 
 function hideCalc() {
-  $(".calc").animate({"left":"100%"}, 150);
-  $(".calc_btn").html("계산하기");
-  $(".calc_btn").attr("onclick", "calculating()");
-  $('.edit_btn').removeClass('active');
-  $(".edit_box").prop("readonly", true);
-  $(".edit_box").attr("onfocus", "this.blur()");
-}
+  var calc = document.querySelector('.calc'),
+      calcBtn = document.querySelector('.calc_btn'),
+      editBtn = document.querySelector('.edit_btn'),
+      editBox = document.querySelector('.edit_box');
+
+  animate(calc, 'left', '100%');
+  calcBtn.innerHTML = '계산하기';
+  calcBtn.setAttribute-('onclick', 'calculating()');
+  editBtn.classList.remove('active');
+  editBox.setAttribute('readonly', true);
+  editBox.setAttribute('onfocus', 'this.blur()');
+};
 
 function showRateChart(e) {
+  var rateBox = document.querySelector('.rate_box');
 
-  $(e).toggleClass('active');
-
-  if($(e).hasClass('active')) {
-    $('.rate_box').stop().slideDown();
+  if (e.classList.contains('active')) {
+    rateBox.style.display = 'none';
+    e.classList.remove('active');
   } else {
-    $('.rate_box').stop().slideUp();
+    rateBox.style.display = 'block';
+    e.classList.add('active');
   }
-}
+};
 
 function showMenu() {
-  $(".menu_popup").animate({"left":"0"}, 200);
-}
+  var menuPopup = document.querySelector('.menu_popup');
+  animate(menuPopup, "left", 0);
+};
 
 function hideMenu() {
-  $(".menu_popup").animate({"left":"100%"}, 200);
-}
+  var menuPopup = document.querySelector('.menu_popup');
+  animate(menuPopup, "left", '100%');
+};
+
+function showExtra() {
+  var extraPopup = document.querySelector('.extra_popup');
+  animate(extraPopup, "left", 0);
+  showQna("전체");
+};
+
+function hideExtra() {
+  var extraPopup = document.querySelector('.extra_popup');
+  animate(extraPopup, "left", '100%');
+};
 
 function showOss() {
-  $(".oss_popup").animate({"left":"0"}, 200);
-}
+  var osSPopup = document.querySelector('.oss_popup');
+  animate(osSPopup, "left", 0);
+};
 
 function hideOss() {
-  $(".oss_popup").animate({"left":"100%"}, 200);
-}
+  var osSPopup = document.querySelector('.oss_popup');
+  animate(osSPopup, "left", '100%');
+};
 
 function showMonthly() {
-  $(".monthly_table").animate({"left":"0"}, 200);
-  $('.monthly_list').scrollTop(0);
-}
+  var monthTable = document.querySelector('.monthly_table'),
+      monthList = document.querySelector('.monthly_list');
+  animate(monthTable, 'left', 0);
+  scrollTo(monthList);
+};
 
 function hideMonthly() {
-  $(".monthly_table").animate({"left":"100%"}, 200);
-}
+  var monthTable = document.querySelector('.monthly_table');
+  animate(monthTable, 'left', '100%');
+};
 
-function closeAdd() {
-  $('.add').fadeOut();
-}
+function showToast(title) {
+  var toastEl = '<div class="toast">'+title+'</div>';
 
-function showAd(){
-  $('.add').fadeOut();
-  window.open("http://www.nuribom.com/default/", "", "");  
-}
+  if (document.querySelector('.toast') == null) {
+    document.body.insertAdjacentHTML("beforeend", toastEl);
+    var toast = document.querySelector('.toast');
+    fadeIn(toast);
+    setTimeout(function(){
+      fadeOut(toast);
+    }, 800);
+  }
+};
 
-function showToast(title){
-  var toast = '<div class="toast">'+title+'</div>';
-  $('body').append(toast);
+function fadeOut(el) {
+  el.style.opacity = 1;
 
-  $(".toast").fadeIn();
-  setTimeout(function(){
-      $(".toast").fadeOut(function(){
-        $(".toast").remove();
-      });
-  }, 1000);
-}
+  (function fade() {
+    if ((el.style.opacity -= .1) < 0) {
+      el.style.display = "none";
+      el.parentNode.removeChild(el);
+    } else {
+      requestAnimationFrame(fade);
+    }
+  })();
+};
+
+function fadeIn(el, display){
+  el.style.opacity = 0;
+  el.style.display = display || "block";
+  
+  (function fade() {
+    var val = parseFloat(el.style.opacity);
+    if (!((val += .1) > 1)) {
+      el.style.opacity = val;
+      requestAnimationFrame(fade);
+    }
+  })();
+};
+
+function animate(el, direction, value) {
+  function frame() {
+    el.style.cssText = `${direction} : ${value}`;
+  };
+  frame();
+};
+
+function scrollTo(el) {
+  el.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+};
+
+function showType(e) {
+  var getType = e.innerHTML,
+      tabList = [];
+
+  if (getType === '전세자금') {
+    orgRecord.forEach(function (getType) {
+      if (getType.type === '전세자금대출') {
+        tabList.push(getType);
+      }
+    });
+  } else if (getType === '중도상환') {
+    orgRecord.forEach(function (getType) {
+      if (getType.type === '중도상환 수수료') {
+        tabList.push(getType);
+      }
+    });
+  } else if (getType === '중개보수') {
+    orgRecord.forEach(function (getType) {
+      if (getType.type === '부동산 중개보수') {
+        tabList.push(getType);
+      }
+    })
+  } else tabList = orgRecord;
+
+  setRecordList(tabList);
+};
