@@ -1,13 +1,13 @@
 var html = "",
-    today = new Date(),
-    year = today.getFullYear(),
-    month = today.getMonth() + 1,
-    date = today.getDate(),
-    getDate = year + "년 " + month + "월 " + date + "일",
-    newRecord = {},
-    calcInput = false,
-    getLocalRecod = localStorage.getItem("record"),
-    getNewest = localStorage.getItem('newest');
+  today = new Date(),
+  year = today.getFullYear(),
+  month = today.getMonth() + 1,
+  date = today.getDate(),
+  getDate = year + "년 " + month + "월 " + date + "일",
+  newRecord = {},
+  calcInput = false,
+  getLocalRecod = localStorage.getItem("record"),
+  getNewest = localStorage.getItem('newest');
 
 let orgRecord,
     newest;
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var splashBoard = document.querySelector('.splash');
 
   fadeIn(splashBoard);
+  setBasicAcc();
 
   setTimeout(() => {
     fadeOut(splashBoard);
@@ -43,7 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
         recordCons.classList.add('active');
         sortList.parentNode.querySelector('div').classList.add('active');
         sortList.children[0].innerHTML = '최신순';
-        sortList.children[0].classList.add('active')
+        sortList.children[0].classList.add('active');
+        orgRecord.reverse();
       } else {
         recordCons.classList.remove('active');
         sortList.children[0].innerHTML = '과거순';
@@ -73,27 +75,28 @@ function setNoRecord() {
   localStorage.clear();
 };
 
-function setRecordList(tabList) {
+function setRecordList(currentTabList, newest) {
   html = "";
   document.querySelector('.sort_list').style.display = 'block',
   branch = null;
-  
-  if (tabList !== undefined) branch = tabList;
+  if (newest === true) orgRecord.reverse();
+  if (currentTabList !== undefined) branch = currentTabList;
   else branch = orgRecord;
+  
   branch.forEach(function (record) {
     if(record.type === '전세자금대출') {
       html +=
-      '<div class="record_box bg_1" id=' +
+      '<div class="record_box bg_1" role="button" id=' +
       record.id +
       '>';
     } else if(record.type === "부동산 중개보수") {
       html +=
-      '<div class="record_box bg_2" id=' +
+      '<div class="record_box bg_2" role="button" id=' +
       record.id +
       '>';
     } else {
       html +=
-      '<div class="record_box bg_3" id=' +
+      '<div class="record_box bg_3" role="button" id=' +
       record.id +
       '>';
     }
@@ -147,7 +150,7 @@ function setRecordList(tabList) {
       ')">' +
       record.date +
       '</div>\
-          <div class="delet_btn" onclick="deletRecord(' +
+          <div class="delet_btn" role="button" aria-labe="" onclick="deletRecord(' +
       record.id +
       ')"><img src="img/del_icon.svg"></div>\
         </div>\
@@ -1438,7 +1441,7 @@ function shareRecord(e) {
   console.log('shareRecord');
 };
 
-function clip(url){
+function clip(url){https://refactoring.guru/ko/design-patterns
 	var t = document.createElement("textarea");
 	document.body.appendChild(t);
 	t.value = url;
@@ -1508,6 +1511,8 @@ function maxLengthChk(e){
     e.value = (e.value.substring(0, maxLength))
 };
 
+var currentTabList = [],
+    currentFilterType = '';
 function sortList(e) {
   var recordCons = document.querySelector('.record_cons'),
       sortList = document.querySelector('.sort_list div');
@@ -1524,9 +1529,13 @@ function sortList(e) {
     newest = true;
   }
 
+  if (currentTabList.length > 0) setRecordList(currentTabList, true);
+  else setRecordList(orgRecord, true);
+
+  setBasicAcc();
   scrollTo(document.querySelector('.record_list'));
   localStorage.setItem("newest", JSON.stringify(newest));
-};
+}
 
 function hideRecordPopup() {
   var recotdPopup = document.querySelector('.record_popup'),
@@ -1684,27 +1693,80 @@ function scrollTo(el) {
 
 function showType(e) {
   var getType = e.innerHTML,
-      tabList = [];
-
+      currentTabList = [];
+  
+  e.classList.add('active');
+  e.setAttribute('aria-selected', true);
+  
+  for (let sibling of e.parentNode.children) {
+    if (sibling !== e) {
+      sibling.classList.remove('active');
+      sibling.setAttribute('aria-selected', false);
+    }
+  }
+  
   if (getType === '전세자금') {
     orgRecord.forEach(function (getType) {
       if (getType.type === '전세자금대출') {
-        tabList.push(getType);
+        currentTabList.push(getType);
       }
     });
   } else if (getType === '중도상환') {
     orgRecord.forEach(function (getType) {
       if (getType.type === '중도상환 수수료') {
-        tabList.push(getType);
+        currentTabList.push(getType);
       }
     });
   } else if (getType === '중개보수') {
     orgRecord.forEach(function (getType) {
       if (getType.type === '부동산 중개보수') {
-        tabList.push(getType);
+        currentTabList.push(getType);
       }
-    })
-  } else tabList = orgRecord;
+    });
+  } else currentTabList = orgRecord;
 
-  setRecordList(tabList);
+  setRecordList(currentTabList);
+  setBasicAcc();
+};
+
+function setBasicAcc() {
+  for (
+      var t = document.querySelectorAll(".aria-txt"), e = document.querySelectorAll(".img-txt, [role='button']"), r = document.querySelectorAll(".aria-hidden"), l = document.querySelectorAll("acc"), i = 0;
+      i < t.length;
+      i++
+    )
+    t[i].setAttribute("tabindex", 0), t[i].setAttribute("role", "text");
+  for (var i = 0; i < e.length; i++) e[i].setAttribute("tabindex", 0);
+  for (var i = 0; i < r.length; i++) r[i].setAttribute("aria-hidden", !0);
+  for (var i = 0; i < l.length; i++) l[i].setAttribute("tabindex", 0), l[i].setAttribute("role", "text");
+
+  setRecordaAcc();
+};
+
+function setRecordaAcc() {
+  const recordBoxes = document.querySelectorAll('.record_box'),
+        records = JSON.parse(localStorage.getItem('record'));
+
+  recordBoxes.forEach(recordBox => {
+    const recordId = recordBox.getAttribute('id'),
+          record = records.find(r => JSON.stringify(r.id) === recordId);
+
+    if (record) {
+      let acc = '';
+
+      switch (record.type) {
+        case '전세자금대출':
+          acc = `계산 유형 ${record.type}, 대출원금 ${record.info1}, 총 대출이자 ${record.info6}, 총 상환금액 ${record.info7}, ${record.date}`;
+          break;
+        case '부동산 중개보수':
+          acc = `계산 유형 ${record.type}, 최대 중개보수 ${record.info6}, 협의/상환요율 ${record.info7}, 거래금액 ${record.info8}, ${record.date}`;
+          break;
+        case '중도상환 수수료':
+          acc = `계산 유형 ${record.type}, 중도상환 수수료 ${record.info6}, 총 상환금액 ${record.type}, ${record.date}`;
+          break;
+      }
+
+      recordBox.setAttribute('aria-label', `${acc}, 상세보기`);
+    }
+  });
 };
