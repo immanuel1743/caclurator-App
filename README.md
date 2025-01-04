@@ -1,1 +1,1 @@
-jqeury to vanilla javascript
+pure js
