@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>html2canvas with File.io</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  </head>
+  <body>
+    <div id="capture" style="width: 200px; height: 200px; background: #f5da55">
+      <h1>Hello world!</h1>
+    </div>
+    <button id="capture-btn">Capture and Share</button>
+    <div id="share-url"></div>
+
+    <script>
+      document
+        .getElementById("capture-btn")
+        .addEventListener("click", function () {
+          html2canvas(document.getElementById("capture")).then(function (
+            canvas
+          ) {
+            canvas.toBlob(function (blob) {
+              var formData = new FormData();
+              formData.append("file", blob, "screenshot.png");
+
+              fetch("https://file.io", {
+                method: "POST",
+                credentials: "include",
+                body: formData,
+                header: {
+                  "Access-Control-Allow-Origin": "*",
+                },
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.success) {
+                    var shareUrl = data.link;
+                    document.getElementById(
+                      "share-url"
+                    ).innerHTML = `<a href="${shareUrl}" target="_blank">${shareUrl}</a>`;
+                  } else {
+                    console.error("Error uploading image:", data);
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                });
+            });
+          });
+        });
+    </script>
+  </body>
+</html>
